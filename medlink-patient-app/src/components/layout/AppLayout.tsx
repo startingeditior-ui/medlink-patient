@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,7 +32,26 @@ const navItems = [
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hideBottomNav, setHideBottomNav] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const { patient, logout } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setHideBottomNav(true);
+      } else {
+        setHideBottomNav(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   if (pathname === '/login' || pathname === '/') {
     return <>{children}</>;
@@ -171,13 +190,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="lg:pl-64">
-        <div className="max-w-4xl mx-auto px-4 py-6 pt-20 lg:pt-6">
+        <div className="max-w-4xl mx-auto px-4 py-6 pt-20 pb-20 lg:pt-6 lg:pb-6">
           {children}
         </div>
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+      <nav className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 transition-transform duration-300 ${hideBottomNav ? 'translate-y-full' : 'translate-y-0'}`}>
         <div className="flex justify-around h-14">
           {navItems.slice(0, 5).map((item) => {
             const isActive = pathname === item.href;

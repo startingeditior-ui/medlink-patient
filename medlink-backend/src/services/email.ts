@@ -78,7 +78,7 @@ export const sendWelcomeEmail = async (
             </p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="#" style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; display: inline-block;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; display: inline-block;">
                 Visit Patient Portal
               </a>
             </div>
