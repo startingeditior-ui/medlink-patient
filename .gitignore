@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log
+yarn-debug.log
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Next.js
+.next/
+out/
+build/
+medlink-patient-app/.next/
+medlink-patient-app/out/
+
+# Node.js Backend
+dist/
+medlink-backend/dist/
+medlink-backend/build/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+*.secret
+*.pem
+medlink-backend/.env
+
+# Database
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Firebase
+medlink-notification-firebase-adminsdk-fbsvc-4659b1ab2c.json
+firebase-adminsdk*.json
+
+# Build artifacts
+*.tsbuildinfo
+.medlink-patient-app
+
+# Debug files
+nul
+
+patient_design_pattern.md
+PRD_Patient_App.md

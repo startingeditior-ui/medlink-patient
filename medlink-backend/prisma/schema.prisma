@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id              String   @id @default(uuid())
+  patientId       String   @unique
+  name            String
+  phone           String   @unique
+  email           String?
+  password        String
+  bloodGroup      String?
+  allergies       String   @default("[]")
+  chronicDiseases String   @default("[]")
+  emergencyContact String?
+  guardianName     String?
+  guardianMobile   String?
+  guardianLocation String?
+  fcmToken         String?
+  profilePhoto    String?
+  dateOfBirth     DateTime?
+  gender          String?
+  address         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  accessRecords   AccessRecord[]
+  consentRequests ConsentRequest[]
+  notifications   Notification[]
+  blockedHospitals BlockedHospital[]
+  otps            OTP[]
+  auditLogs       AuditLog[]
+}
+
+model Hospital {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  phone     String?
+  createdAt DateTime @default(now())
+
+  doctors         Doctor[]
+  accessRecords   AccessRecord[]
+  consentRequests ConsentRequest[]
+  blockedHospitals BlockedHospital[]
+  auditLogs       AuditLog[]
+}
+
+model Doctor {
+  id             String   @id @default(uuid())
+  name           String
+  specialization String?
+  hospitalId     String
+  createdAt      DateTime @default(now())
+
+  hospital         Hospital       @relation(fields: [hospitalId], references: [id])
+  accessRecords    AccessRecord[]
+  consentRequests  ConsentRequest[]
+  auditLogs        AuditLog[]
+}
+
+model AccessRecord {
+  id              String        @id @default(uuid())
+  patientId       String
+  doctorId        String
+  hospitalId      String
+  accessStartTime DateTime      @default(now())
+  accessExpiryTime DateTime
+  recordsViewed   String        @default("[]")
+  status          String        @default("ACTIVE")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  patient  Patient  @relation(fields: [patientId], references: [id])
+  doctor   Doctor   @relation(fields: [doctorId], references: [id])
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+}
+
+model ConsentRequest {
+  id                String   @id @default(uuid())
+  patientId         String
+  doctorId          String
+  hospitalId        String
+  recordsRequested  String   @default("[]")
+  status            String   @default("PENDING")
+  duration          Int      @default(24)
+  requestTime       DateTime @default(now())
+  responseTime      DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  patient  Patient  @relation(fields: [patientId], references: [id])
+  doctor   Doctor   @relation(fields: [doctorId], references: [id])
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+}
+
+model Notification {
+  id           String   @id @default(uuid())
+  patientId    String
+  type         String
+  title        String
+  message      String
+  doctorName   String?
+  hospitalName String?
+  accessTime   DateTime?
+  read         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model BlockedHospital {
+  id        String   @id @default(uuid())
+  patientId String
+  hospitalId String
+  blockedAt DateTime @default(now())
+
+  patient  Patient  @relation(fields: [patientId], references: [id])
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+
+  @@unique([patientId, hospitalId])
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  patientId String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  patientId   String?
+  doctorId    String?
+  hospitalId  String?
+  action      String
+  description String
+  metadata    String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  patient   Patient?   @relation(fields: [patientId], references: [id])
+  doctor    Doctor?    @relation(fields: [doctorId], references: [id])
+  hospital  Hospital?  @relation(fields: [hospitalId], references: [id])
+
+  @@index([patientId])
+  @@index([action])
+  @@index([createdAt])
+}
