@@ -22,11 +22,7 @@ router.get('/pending', authMiddleware, async (req: AuthRequest, res: Response) =
         status: 'PENDING'
       },
       include: {
-        doctor: {
-          include: {
-            specialization: true
-          }
-        },
+        doctor: true,
         hospital: true
       },
       orderBy: { requestTime: 'desc' }
@@ -38,7 +34,7 @@ router.get('/pending', authMiddleware, async (req: AuthRequest, res: Response) =
       doctorId: req.doctorId,
       doctorName: req.doctor.name,
       hospitalName: req.hospital.name,
-      specialization: req.doctor.specialization?.name || null,
+      specialization: req.doctor.specialty ?? null,
       requestTime: req.requestTime.toISOString(),
       recordsRequested: JSON.parse(req.recordsRequested),
       status: req.status.toLowerCase(),
@@ -205,7 +201,7 @@ router.post('/:requestId/approve', [
 
     const consentRequest = await prisma.consentRequest.findUnique({
       where: { id: requestId },
-      include: { doctor: { include: { specialization: true } }, hospital: true }
+      include: { doctor: true, hospital: true }
     });
 
     if (!consentRequest) {
@@ -287,7 +283,7 @@ router.post('/:requestId/reject', authMiddleware, async (req: AuthRequest, res: 
 
     const consentRequest = await prisma.consentRequest.findUnique({
       where: { id: requestId },
-      include: { doctor: { include: { specialization: true } }, hospital: true }
+      include: { doctor: true, hospital: true }
     });
 
     if (!consentRequest) {

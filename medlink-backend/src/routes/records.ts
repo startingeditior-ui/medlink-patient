@@ -58,7 +58,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
       include: {
         recordType: true,
         hospital: { select: { id: true, name: true } },
-        doctor: { select: { id: true, name: true, specialization: true } },
+        doctor: { select: { id: true, name: true, specialty: true } },
       },
       orderBy: { date: 'desc' },
       take: Number(limit),
@@ -78,7 +78,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         hospitalName: r.hospital?.name,
         doctorId: r.doctorId,
         doctorName: r.doctor?.name,
-        doctorSpecialization: r.doctor?.specialization?.name,
+        doctorSpecialization: r.doctor?.specialty ?? null,
         recordType: r.recordType,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
@@ -103,7 +103,7 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
       include: {
         recordType: true,
         hospital: true,
-        doctor: { include: { specialization: true } },
+        doctor: true,
       },
     });
 

@@ -153,23 +153,27 @@ router.get('/audit-logs', authMiddleware, async (req: AuthRequest, res: Response
     const patientId = req.patientId!;
     const limit = parseInt(req.query.limit as string) || 50;
 
+    // Get the patient's userId to query audit_logs by actorId (cloud schema)
+    const patient = await prisma.patient.findUnique({
+      where: { id: patientId },
+      select: { userId: true }
+    });
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
     const logs = await prisma.auditLog.findMany({
-      where: { patientId },
+      where: { actorId: patient.userId },
       orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
-        doctor: { select: { name: true } },
-        hospital: { select: { name: true } }
-      }
+      take: limit
     });
 
     const formattedLogs = logs.map(log => ({
       id: log.id,
       action: log.action,
-      description: log.description,
-      doctorName: log.doctor?.name,
-      hospitalName: log.hospital?.name,
-      metadata: log.metadata,   // already parsed Json — no JSON.parse needed
+      description: log.description ?? null,
+      metadata: log.metadata,
       createdAt: log.createdAt.toISOString()
     }));
 

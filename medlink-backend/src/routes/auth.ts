@@ -25,45 +25,40 @@ const initializeFirebase = () => {
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-const normalizePhone = (phone: string): string => {
-  const cleaned = phone.replace(/\D/g, '');
-  if (cleaned.startsWith('91') && cleaned.length === 12) {
-    return `+91 ${cleaned.slice(2, 7)} ${cleaned.slice(7)}`;
-  }
-  if (cleaned.length === 10) {
-    return `+91 ${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
-  }
-  if (phone.startsWith('+')) {
-    const withSpace = phone.replace(/(\+\d{2})(\d{5})(\d{5})/, '$1 $2 $3');
-    return withSpace;
-  }
-  return phone;
+// Build all possible phone formats to match any registration format
+const buildPhoneVariants = (phone: string): string[] => {
+  const digits = phone.replace(/\D/g, ''); // strip all non-digits
+  const last10 = digits.slice(-10);         // raw 10 digits (most common stored format)
+
+  const variants = new Set<string>();
+  variants.add(phone.trim());                                         // whatever was sent as-is
+  variants.add(last10);                                               // "9876543210"
+  variants.add(`+91${last10}`);                                       // "+919876543210"
+  variants.add(`+91 ${last10.slice(0, 5)} ${last10.slice(5)}`);      // "+91 98765 43210"
+  variants.add(`91${last10}`);                                        // "919876543210"
+  return Array.from(variants);
 };
 
 router.post('/login', async (req: AuthRequest, res: Response) => {
   try {
     const { phone, patientId } = req.body;
-    
+
     let patient: any = null;
     let loginIdentifier = '';
 
     if (phone) {
-      const normalizedPhone = normalizePhone(phone);
-      loginIdentifier = normalizedPhone;
-      
+      const phoneVariants = buildPhoneVariants(phone);
+      loginIdentifier = phone.replace(/\D/g, '').slice(-10); // store raw 10 digits as identifier
+
       patient = await prisma.patient.findFirst({
         where: {
           user: {
-            OR: [
-              { phone: normalizedPhone },
-              { phone: phone },
-              { phone: `+91 ${phone.replace(/\D/g, '').slice(-10)}` }
-            ]
+            phone: { in: phoneVariants }
           }
         },
         include: { user: true }
       });
-      
+
       if (!patient) {
         return res.status(404).json({ error: 'Patient not found with this phone number' });
       }
@@ -117,15 +112,11 @@ router.post('/verify-otp', async (req: AuthRequest, res: Response) => {
     let patient: any = null;
 
     if (phone) {
-      const normalizedPhone = normalizePhone(phone);
+      const phoneVariants = buildPhoneVariants(phone);
       patient = await prisma.patient.findFirst({
         where: {
           user: {
-            OR: [
-              { phone: normalizedPhone },
-              { phone: phone },
-              { phone: `+91 ${phone.replace(/\D/g, '').slice(-10)}` }
-            ]
+            phone: { in: phoneVariants }
           }
         },
         include: { user: true }

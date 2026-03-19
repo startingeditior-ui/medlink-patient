@@ -5,14 +5,18 @@ import { PrismaClient } from '@prisma/client';
 const router = Router();
 const prisma = new PrismaClient();
 
+// GET /api/hospitals — list hospitals with optional filters
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { hospitalTypeId, search, limit = 50, offset = 0 } = req.query;
+    const { facilityType, ownershipType, search, limit = 50, offset = 0 } = req.query;
 
     const where: any = {};
 
-    if (hospitalTypeId) {
-      where.hospitalTypeId = hospitalTypeId as string;
+    if (facilityType) {
+      where.facilityType = { contains: facilityType as string, mode: 'insensitive' };
+    }
+    if (ownershipType) {
+      where.ownershipType = { contains: ownershipType as string, mode: 'insensitive' };
     }
     if (search) {
       where.OR = [
@@ -24,7 +28,6 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     const hospitals = await prisma.hospital.findMany({
       where,
       include: {
-        hospitalType: true,
         _count: {
           select: { doctors: true },
         },
@@ -41,9 +44,9 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
         id: h.id,
         name: h.name,
         address: h.address,
-        phone: h.phone,
-        hospitalTypeId: h.hospitalTypeId,
-        hospitalType: h.hospitalType?.name,
+        facilityType: h.facilityType,
+        ownershipType: h.ownershipType,
+        verified: h.verified,
         doctorCount: h._count.doctors,
       })),
       total,
@@ -56,30 +59,25 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
+// GET /api/hospitals/types — distinct facility types
 router.get('/types', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const hospitalTypes = await prisma.hospitalType.findMany({
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: { hospitals: true },
-        },
-      },
+    const types = await prisma.hospital.findMany({
+      select: { facilityType: true },
+      distinct: ['facilityType'],
+      orderBy: { facilityType: 'asc' },
     });
 
     res.json({
-      hospitalTypes: hospitalTypes.map(ht => ({
-        id: ht.id,
-        name: ht.name,
-        hospitalCount: ht._count.hospitals,
-      })),
+      facilityTypes: types.map(h => h.facilityType).filter(Boolean),
     });
   } catch (error) {
-    console.error('Error fetching hospital types:', error);
-    res.status(500).json({ error: 'Failed to fetch hospital types' });
+    console.error('Error fetching facility types:', error);
+    res.status(500).json({ error: 'Failed to fetch facility types' });
   }
 });
 
+// GET /api/hospitals/:id — single hospital with its doctors
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -87,9 +85,8 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const hospital = await prisma.hospital.findUnique({
       where: { id },
       include: {
-        hospitalType: true,
         doctors: {
-          include: { specialization: true },
+          select: { id: true, name: true, specialty: true },
         },
       },
     });
@@ -103,13 +100,14 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
         id: hospital.id,
         name: hospital.name,
         address: hospital.address,
-        phone: hospital.phone,
-        hospitalTypeId: hospital.hospitalTypeId,
-        hospitalType: hospital.hospitalType?.name,
+        facilityType: hospital.facilityType,
+        ownershipType: hospital.ownershipType,
+        managerName: hospital.managerName,
+        verified: hospital.verified,
         doctors: hospital.doctors.map(d => ({
           id: d.id,
           name: d.name,
-          specialization: d.specialization?.name,
+          specialty: d.specialty,
         })),
       }
     });

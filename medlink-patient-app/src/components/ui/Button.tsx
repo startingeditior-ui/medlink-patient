@@ -18,19 +18,19 @@ export function Button({
   disabled,
   ...props 
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2';
   
   const variantClasses = {
-    filled: 'bg-emerald-500 text-black hover:bg-emerald-600',
+    filled: 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm',
     tonal: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-    outlined: 'border border-gray-300 text-gray-700 hover:bg-gray-100',
+    outlined: 'border border-gray-300 text-gray-700 hover:bg-gray-50 bg-white',
     ghost: 'text-gray-600 hover:bg-gray-100',
   };
 
   const sizeClasses = {
-    sm: 'px-3 py-1.5 rounded-lg text-sm',
-    md: 'px-4 py-2 rounded-lg',
-    lg: 'px-6 py-3 rounded-lg',
+    sm: 'px-3 py-1.5 rounded-xl text-sm',
+    md: 'px-5 py-2.5 rounded-xl text-sm',
+    lg: 'px-6 py-3 rounded-xl text-base',
   };
 
   return (

@@ -5,14 +5,15 @@ import { PrismaClient } from '@prisma/client';
 const router = Router();
 const prisma = new PrismaClient();
 
+// GET /api/doctors — list doctors with optional filters
 router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { specializationId, hospitalId, search, limit = 50, offset = 0 } = req.query;
+    const { specialty, hospitalId, search, limit = 50, offset = 0 } = req.query;
 
     const where: any = {};
 
-    if (specializationId) {
-      where.specializationId = specializationId as string;
+    if (specialty) {
+      where.specialty = { contains: specialty as string, mode: 'insensitive' };
     }
     if (hospitalId) {
       where.hospitalId = hospitalId as string;
@@ -20,14 +21,14 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
     if (search) {
       where.OR = [
         { name: { contains: search as string, mode: 'insensitive' } },
+        { specialty: { contains: search as string, mode: 'insensitive' } },
       ];
     }
 
     const doctors = await prisma.doctor.findMany({
       where,
       include: {
-        specialization: true,
-        hospital: { select: { id: true, name: true, address: true, phone: true } },
+        hospital: { select: { id: true, name: true, address: true } },
       },
       orderBy: { name: 'asc' },
       take: Number(limit),
@@ -40,12 +41,11 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
       doctors: doctors.map(d => ({
         id: d.id,
         name: d.name,
-        specializationId: d.specializationId,
-        specialization: d.specialization?.name,
+        specialty: d.specialty,
+        systemOfMedicine: d.systemOfMedicine,
         hospitalId: d.hospitalId,
         hospitalName: d.hospital?.name,
         hospitalAddress: d.hospital?.address,
-        hospitalPhone: d.hospital?.phone,
       })),
       total,
       limit: Number(limit),
@@ -57,30 +57,25 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-router.get('/specializations', authMiddleware, async (req: AuthRequest, res: Response) => {
+// GET /api/doctors/specialties — list distinct specialties
+router.get('/specialties', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const specializations = await prisma.specialization.findMany({
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: { doctors: true },
-        },
-      },
+    const specialties = await prisma.doctor.findMany({
+      select: { specialty: true },
+      distinct: ['specialty'],
+      orderBy: { specialty: 'asc' },
     });
 
     res.json({
-      specializations: specializations.map(s => ({
-        id: s.id,
-        name: s.name,
-        doctorCount: s._count.doctors,
-      })),
+      specialties: specialties.map(d => d.specialty).filter(Boolean),
     });
   } catch (error) {
-    console.error('Error fetching specializations:', error);
-    res.status(500).json({ error: 'Failed to fetch specializations' });
+    console.error('Error fetching specialties:', error);
+    res.status(500).json({ error: 'Failed to fetch specialties' });
   }
 });
 
+// GET /api/doctors/:id — single doctor
 router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -88,7 +83,6 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     const doctor = await prisma.doctor.findUnique({
       where: { id },
       include: {
-        specialization: true,
         hospital: true,
       },
     });
@@ -101,8 +95,10 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
       doctor: {
         id: doctor.id,
         name: doctor.name,
-        specializationId: doctor.specializationId,
-        specialization: doctor.specialization?.name,
+        specialty: doctor.specialty,
+        systemOfMedicine: doctor.systemOfMedicine,
+        stateMedicalCouncil: doctor.stateMedicalCouncil,
+        registrationYear: doctor.registrationYear,
         hospitalId: doctor.hospitalId,
         hospital: doctor.hospital,
       }

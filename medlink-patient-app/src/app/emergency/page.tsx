@@ -138,7 +138,7 @@ Scan QR code or visit MedLink to verify.
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-2 text-error"
+        className="flex items-center gap-2 text-red-600"
       >
         <AlertCircle className="w-6 h-6" />
         <h1 className="text-xl font-bold">Emergency Card</h1>
@@ -148,7 +148,7 @@ Scan QR code or visit MedLink to verify.
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-text-secondary text-sm"
+        className="text-gray-500 text-sm"
       >
         Show this to medical staff in case of emergency
       </motion.p>
@@ -162,12 +162,12 @@ Scan QR code or visit MedLink to verify.
         <Card ref={cardRef} className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 p-5 max-w-sm w-full">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-error" />
-              <span className="font-bold text-error">MEDLINK ID</span>
+              <Shield className="w-6 h-6 text-red-600" />
+              <span className="font-bold text-red-600">MEDLINK ID</span>
             </div>
             <div className="text-right">
-              <p className="text-xs text-text-secondary">Patient ID</p>
-              <p className="font-mono font-bold text-text-primary">{patient.patientId}</p>
+              <p className="text-xs text-gray-500">Patient ID</p>
+              <p className="font-mono font-bold text-gray-900">{patient.patientId}</p>
             </div>
           </div>
 
@@ -177,17 +177,17 @@ Scan QR code or visit MedLink to verify.
                 <Droplet className="w-6 h-6 text-error" />
               </div>
               <div>
-                <p className="text-xs text-text-secondary">Blood Group</p>
-                <p className="text-2xl font-bold text-error">{emergencyData.bloodGroup}</p>
+                <p className="text-xs text-gray-500">Blood Group</p>
+                <p className="text-2xl font-bold text-red-600">{emergencyData.bloodGroup}</p>
               </div>
             </div>
 
-            <div className="divider" />
+            <div className="h-px bg-red-200 my-1" />
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-4 h-4 text-error" />
-                <p className="text-sm font-medium text-text-primary">Known Allergies</p>
+                <AlertTriangle className="w-4 h-4 text-red-600" />
+                <p className="text-sm font-medium text-gray-900">Known Allergies</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {emergencyData.allergies.map((allergy, idx) => (
@@ -200,8 +200,8 @@ Scan QR code or visit MedLink to verify.
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Heart className="w-4 h-4 text-error" />
-                <p className="text-sm font-medium text-text-primary">Chronic Conditions</p>
+                <Heart className="w-4 h-4 text-red-600" />
+                <p className="text-sm font-medium text-gray-900">Chronic Conditions</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {emergencyData.chronicDiseases.map((disease, idx) => (
@@ -212,35 +212,35 @@ Scan QR code or visit MedLink to verify.
               </div>
             </div>
 
-            <div className="divider" />
+            <div className="h-px bg-red-200 my-1" />
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <PhoneCall className="w-4 h-4 text-error" />
-                <p className="text-sm font-medium text-text-primary">Emergency Contact</p>
+                <PhoneCall className="w-4 h-4 text-red-600" />
+                <p className="text-sm font-medium text-gray-900">Emergency Contact</p>
               </div>
-              <p className="text-lg font-semibold text-text-primary">{emergencyData.emergencyContact}</p>
+              <p className="text-lg font-semibold text-gray-900">{emergencyData.emergencyContact}</p>
             </div>
 
-            <div className="divider" />
+            <div className="h-px bg-red-200 my-1" />
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-4 h-4 text-error" />
-                <p className="text-sm font-medium text-text-primary">Guardian Information</p>
+                <Shield className="w-4 h-4 text-red-600" />
+                <p className="text-sm font-medium text-gray-900">Guardian Information</p>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-text-outline" />
-                  <p className="text-base font-medium text-text-primary">{emergencyData.guardianName}</p>
+                  <p className="text-base font-medium text-gray-900">{emergencyData.guardianName}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <PhoneCall className="w-4 h-4 text-text-outline" />
-                  <p className="text-base font-medium text-text-primary">{emergencyData.guardianMobile}</p>
+                  <p className="text-base font-medium text-gray-900">{emergencyData.guardianMobile}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-text-outline" />
-                  <p className="text-base font-medium text-text-primary">{emergencyData.guardianLocation}</p>
+                  <p className="text-base font-medium text-gray-900">{emergencyData.guardianLocation}</p>
                 </div>
               </div>
             </div>
@@ -251,31 +251,31 @@ Scan QR code or visit MedLink to verify.
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <CreditCard className="w-4 h-4 text-error" />
-                    <p className="text-sm font-medium text-text-primary">Insurance Information</p>
+                    <p className="text-sm font-medium text-gray-900">Insurance Information</p>
                   </div>
                   <div className="space-y-2">
                     {emergencyData.insuranceProvider && (
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-text-outline" />
-                        <p className="text-base font-medium text-text-primary">{emergencyData.insuranceProvider}</p>
+                        <Shield className="w-4 h-4 text-gray-400" />
+                        <p className="text-base font-medium text-gray-900">{emergencyData.insuranceProvider}</p>
                       </div>
                     )}
                     {emergencyData.insuranceCustomerId && (
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-text-outline" />
-                        <p className="text-base font-medium text-text-primary">ID: {emergencyData.insuranceCustomerId}</p>
+                        <CreditCard className="w-4 h-4 text-gray-400" />
+                        <p className="text-base font-medium text-gray-900">ID: {emergencyData.insuranceCustomerId}</p>
                       </div>
                     )}
                     {emergencyData.insuranceType && (
                       <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-text-outline" />
-                        <p className="text-base font-medium text-text-primary">{emergencyData.insuranceType}</p>
+                        <CreditCard className="w-4 h-4 text-gray-400" />
+                        <p className="text-base font-medium text-gray-900">{emergencyData.insuranceType}</p>
                       </div>
                     )}
                     {emergencyData.insuranceSupportNumber && (
                       <div className="flex items-center gap-2">
-                        <PhoneCall className="w-4 h-4 text-text-outline" />
-                        <p className="text-base font-medium text-text-primary">{emergencyData.insuranceSupportNumber}</p>
+                        <PhoneCall className="w-4 h-4 text-gray-400" />
+                        <p className="text-base font-medium text-gray-900">{emergencyData.insuranceSupportNumber}</p>
                       </div>
                     )}
                   </div>

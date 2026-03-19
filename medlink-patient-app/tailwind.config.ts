@@ -17,9 +17,28 @@ export default {
           600: "#047857",
           700: "#065F46",
         },
+        // Semantic surface tokens
+        "surface-lowest": "#FFFFFF",
+        "surface-low": "#F9FAFB",
+        "surface-high": "#F3F4F6",
+        // Semantic text tokens
+        "text-primary": "#111827",
+        "text-secondary": "#6B7280",
+        "text-outline": "#9CA3AF",
+        // Semantic state tokens
+        error: "#BA1A1A",
+        warning: "#D97706",
+        "outline-variant": "#E5E7EB",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        "2xl": "1rem",
+        "3xl": "1.5rem",
+      },
+      boxShadow: {
+        card: "0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)",
       },
     },
   },

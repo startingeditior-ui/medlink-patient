@@ -18,6 +18,7 @@ body {
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F9FAFB;
 }
 
 /* Custom scrollbar */
@@ -31,12 +32,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #d1d5db;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #9ca3af;
 }
 
 /* Smooth scrolling */
@@ -71,4 +72,31 @@ a {
 /* Input reset */
 input, textarea, select {
   font: inherit;
+}
+
+/* Utility: Standard white card */
+@layer components {
+  .md-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
+  }
+
+  .md-card-sm {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4;
+  }
+
+  .icon-circle {
+    @apply w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0;
+  }
+
+  .icon-circle-sm {
+    @apply w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0;
+  }
+
+  .pill-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .section-heading {
+    @apply font-semibold text-gray-800 text-base;
+  }
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Phone, User, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Phone, User, ArrowRight, ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Elements';
 import { useAuth } from '@/hooks/useAuth';
@@ -41,16 +41,8 @@ function LoginForm() {
 
   const validatePatientId = (id: string) => {
     const trimmed = id.trim().toUpperCase();
-    // MLPR-YYYYXXXX format (e.g., MLPR-20260001)
     const pattern = /^MLPR-\d{8}$/;
     return pattern.test(trimmed);
-  };
-
-  const formatPhone = (value: string) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 2) return cleaned;
-    if (cleaned.length <= 7) return `+${cleaned.slice(0, 2)} ${cleaned.slice(2)}`;
-    return `+${cleaned.slice(0, 2)} ${cleaned.slice(2, 7)} ${cleaned.slice(7, 12)}`;
   };
 
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -64,20 +56,18 @@ function LoginForm() {
         return;
       }
       const cleanedPhone = inputValue.replace(/\D/g, '').slice(-10);
-      const formattedPhone = `+91 ${cleanedPhone.slice(0, 5)} ${cleanedPhone.slice(5)}`;
-      
+      // Send raw 10-digit phone — backend matches all stored formats
       try {
-        await loginWithPhone(formattedPhone);
+        await loginWithPhone(cleanedPhone);
         setShowOTP(true);
       } catch (err: any) {
         setError(err.message || 'Failed to send OTP. Please try again.');
       }
     } else {
       if (!validatePatientId(inputValue)) {
-        setInputError('Please enter your Patient ID');
+        setInputError('Please enter your Patient ID (e.g. MLPR-20260001)');
         return;
       }
-      
       try {
         await loginWithPatientId(inputValue.toUpperCase().trim());
         setShowOTP(true);
@@ -99,18 +89,15 @@ function LoginForm() {
     try {
       let identifier: string;
       if (loginMethod === 'phone') {
-        const cleanedPhone = inputValue.replace(/\D/g, '').slice(-10);
-        identifier = `+91 ${cleanedPhone.slice(0, 5)} ${cleanedPhone.slice(5)}`;
+        // Send raw 10-digit phone — backend matches all stored formats
+        identifier = inputValue.replace(/\D/g, '').slice(-10);
       } else {
         identifier = inputValue.toUpperCase().trim();
       }
-      
       await verifyOTP(identifier, otp, loginMethod);
       setIsSuccess(true);
-      setSuccessMessage('You have successfully logged in to the patient portal!');
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+      setSuccessMessage('Login successful!');
+      setTimeout(() => router.push('/'), 2000);
     } catch (err: any) {
       setError(err.message || 'Invalid OTP. Please try again.');
     }
@@ -130,16 +117,17 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-lowest flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 lg:px-6 py-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <Image src="/ML.png" alt="MedLinkID" width={64} height={64} className="w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-4" />
-          <h1 className="text-2xl lg:text-3xl font-bold text-text-primary">MedLinkID</h1>
-          <p className="text-text-secondary mt-2">Your Digital Medical Record</p>
+          <Image src="/ML.png" alt="MedLinkID" width={64} height={64} className="w-16 h-16 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900">MedLinkID</h1>
+          <p className="text-gray-500 mt-1 text-sm">Your Digital Medical Record</p>
         </motion.div>
 
         <motion.div
@@ -148,71 +136,74 @@ function LoginForm() {
           transition={{ delay: 0.1 }}
           className="w-full max-w-md"
         >
+          {/* Back button */}
           <button
             onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary mb-4 transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4 transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back to Home</span>
+            Back to Home
           </button>
 
+          {/* Success State */}
           {isSuccess && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-green-100 border border-green-400 text-green-700 px-4 py-6 rounded-xl text-center mb-6"
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center mb-6"
             >
-              <div className="flex justify-center mb-2">
-                <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-emerald-600" />
               </div>
-              <p className="font-semibold text-lg">{successMessage}</p>
-              <p className="text-sm mt-1">Redirecting to dashboard...</p>
+              <p className="font-semibold text-lg text-gray-800">{successMessage}</p>
+              <p className="text-sm text-gray-500 mt-1">Redirecting to dashboard...</p>
             </motion.div>
           )}
 
-          {!showOTP ? (
-            <form onSubmit={handleSendOTP} className="space-y-6">
-              <div className="md-card">
-                <h2 className="text-lg font-semibold mb-4">Welcome Back</h2>
-                <p className="text-text-secondary text-sm mb-6">
+          {/* Session warning */}
+          {sessionMessage && (
+            <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl mb-4 text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {sessionMessage}
+            </div>
+          )}
+
+          {/* Main Card */}
+          {!isSuccess && !showOTP && (
+            <form onSubmit={handleSendOTP}>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">Welcome Back</h2>
+                <p className="text-gray-500 text-sm mb-6">
                   Login with your phone number or Patient ID
                 </p>
-                
-                <div className="flex gap-2 mb-4">
-                  <button
-                    type="button"
-                    onClick={() => toggleLoginMethod('phone')}
-                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                      loginMethod === 'phone'
-                        ? 'bg-primary text-white'
-                        : 'bg-surface-low text-text-secondary hover:bg-surface-high'
-                    }`}
-                  >
-                    Phone Number
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleLoginMethod('patientId')}
-                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
-                      loginMethod === 'patientId'
-                        ? 'bg-primary text-white'
-                        : 'bg-surface-low text-text-secondary hover:bg-surface-high'
-                    }`}
-                  >
-                    Patient ID
-                  </button>
+
+                {/* Segmented Toggle */}
+                <div className="flex bg-gray-100 rounded-xl p-1 mb-5">
+                  {(['phone', 'patientId'] as LoginMethod[]).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => toggleLoginMethod(m)}
+                      className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
+                        loginMethod === m
+                          ? 'bg-white text-emerald-700 shadow-sm border border-gray-200'
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {m === 'phone' ? 'Phone Number' : 'Patient ID'}
+                    </button>
+                  ))}
                 </div>
 
                 {loginMethod === 'phone' ? (
                   <Input
                     label="Phone Number"
                     type="tel"
-                    placeholder="+91 98765 43210"
+                    placeholder="9876543210"
                     value={inputValue}
-                    onChange={(e) => setInputValue(formatPhone(e.target.value))}
-                    icon={<Phone className="w-5 h-5 text-text-outline" />}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    icon={<Phone className="w-4 h-4" />}
+                    error={inputError}
                   />
                 ) : (
                   <Input
@@ -221,49 +212,39 @@ function LoginForm() {
                     placeholder="MLPR-20250012"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-                    icon={<User className="w-5 h-5 text-text-outline" />}
+                    icon={<User className="w-4 h-4" />}
+                    error={inputError}
                   />
                 )}
-                
-                {inputError && (
-                  <div className="flex items-center gap-2 mt-2 text-error text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    {inputError}
-                  </div>
-                )}
-                
-                {sessionMessage && (
-                  <div className="flex items-center gap-2 mt-2 text-yellow-600 text-sm bg-yellow-50 px-3 py-2 rounded-lg">
-                    <AlertCircle className="w-4 h-4" />
-                    {sessionMessage}
-                  </div>
-                )}
-                
+
                 {error && (
-                  <div className="flex items-center gap-2 mt-2 text-error text-sm">
-                    <AlertCircle className="w-4 h-4" />
+                  <div className="flex items-center gap-2 mt-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded-xl border border-red-100">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     {error}
                   </div>
                 )}
               </div>
 
-              <Button type="submit" className="w-full" isLoading={isLoading}>
+              <Button type="submit" className="w-full" isLoading={isLoading} size="lg">
                 Send OTP
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              
-              <p className="text-center text-text-secondary text-sm">
+
+              <p className="text-center text-gray-400 text-xs mt-4">
                 Test: +91 98765 43210 or MLPR-20260001
               </p>
             </form>
-          ) : (
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
-              <div className="md-card">
-                <h2 className="text-lg font-semibold mb-4">Verify OTP</h2>
-                <p className="text-text-secondary text-sm mb-6">
-                  We sent a 6-digit code to your registered mobile number
+          )}
+
+          {/* OTP Step */}
+          {!isSuccess && showOTP && (
+            <form onSubmit={handleVerifyOTP}>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">Verify OTP</h2>
+                <p className="text-gray-500 text-sm mb-6">
+                  We sent a 6-digit code to your registered number
                 </p>
-                
+
                 <Input
                   label="Enter OTP"
                   type="text"
@@ -271,35 +252,35 @@ function LoginForm() {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   maxLength={6}
-                  className="text-center text-2xl tracking-widest"
+                  className="text-center text-2xl tracking-[0.5em] font-bold"
                 />
-                
+
                 {error && (
-                  <div className="flex items-center gap-2 mt-2 text-error text-sm">
-                    <AlertCircle className="w-4 h-4" />
+                  <div className="flex items-center gap-2 mt-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded-xl border border-red-100">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     {error}
                   </div>
                 )}
               </div>
 
-              <Button type="submit" className="w-full" isLoading={isLoading}>
-                Verify & Login
+              <Button type="submit" className="w-full" isLoading={isLoading} size="lg">
+                Verify &amp; Login
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-4 mt-4 text-sm">
                 <button
                   type="button"
                   onClick={() => setShowOTP(false)}
-                  className="text-text-secondary text-sm hover:text-primary transition-colors"
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  Change {loginMethod === 'phone' ? 'Phone Number' : 'Patient ID'}
+                  ← Change {loginMethod === 'phone' ? 'Number' : 'Patient ID'}
                 </button>
-                <span className="hidden sm:inline text-text-outline">|</span>
+                <span className="text-gray-300">|</span>
                 <button
                   type="button"
                   onClick={handleResendOTP}
-                  className="text-primary text-sm hover:text-primary/80 transition-colors"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
                 >
                   Resend OTP
                 </button>
@@ -309,8 +290,9 @@ function LoginForm() {
         </motion.div>
       </div>
 
-      <div className="p-6 text-center">
-        <p className="text-text-outline text-xs">
+      {/* Footer note */}
+      <div className="pb-8 text-center">
+        <p className="text-gray-400 text-xs">
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>
@@ -321,8 +303,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-surface-lowest flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <LoginForm />

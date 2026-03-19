@@ -22,7 +22,6 @@ import {
   Filter,
   Loader2,
 } from 'lucide-react';
-import { Card } from '@/components/ui/Elements';
 import { useSocket } from '@/hooks/useSocket';
 import { recordsAPI } from '@/lib/api';
 import { MedicalRecord, MedicalRecordType } from '@/types';
@@ -268,51 +267,51 @@ export default function RecordsPage() {
   const stats = getTotalStats();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-xl lg:text-2xl font-bold text-text-primary">Medical Records</h1>
-        <p className="text-text-secondary text-sm lg:text-base">View your medical history organized by hospital</p>
+        <h1 className="text-xl font-bold text-gray-900">Medical Records</h1>
+        <p className="text-gray-500 text-sm mt-0.5">Your medical history organized by hospital</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="bg-primary/5 border-primary/20 p-4">
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Hospitals</p>
-              <p className="text-2xl font-bold text-primary">{stats.hospitals}</p>
+              <p className="text-xs text-gray-500">Hospitals</p>
+              <p className="text-2xl font-bold text-emerald-600">{stats.hospitals}</p>
             </div>
           </div>
-        </Card>
+        </div>
         
-        <Card className="bg-primary/5 border-primary/20 p-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <FileText className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Total Records</p>
-              <p className="text-2xl font-bold text-primary">{stats.totalRecords}</p>
+              <p className="text-xs text-gray-500">Total Records</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.totalRecords}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="bg-primary/5 border-primary/20 p-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Latest Record</p>
-              <p className="text-lg font-bold text-primary">{stats.latestDate}</p>
+              <p className="text-xs text-gray-500">Latest Record</p>
+              <p className="text-base font-bold text-purple-600 leading-tight">{stats.latestDate}</p>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       <motion.div
@@ -321,20 +320,20 @@ export default function RecordsPage() {
         transition={{ delay: 0.1 }}
       >
         {/* Search and Filter Section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4">
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search Input */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by record title or description..."
+                placeholder="Search records..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm bg-gray-50"
               />
               {isFiltering && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 animate-spin" />
               )}
             </div>
             
@@ -346,82 +345,83 @@ export default function RecordsPage() {
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full sm:w-48 pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent appearance-none bg-white cursor-pointer"
+                className="w-full sm:w-44 pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent appearance-none bg-gray-50 cursor-pointer text-sm"
               >
                 <option value="">All Record Types</option>
                 {recordTypes.map(type => (
                   <option key={type.id} value={type.id}>{type.name}</option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
 
             {/* Clear Filters Button */}
             {(searchTerm || selectedType) && (
               <button
                 onClick={handleClearFilters}
-                className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
+                className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors whitespace-nowrap font-medium"
               >
-                Clear Filters
+                Clear
               </button>
             )}
           </div>
 
-          {/* Active Filters Display */}
+          {/* Active Filter Chips */}
           {(searchTerm || selectedType) && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               {searchTerm && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">
-                  Search: &quot;{searchTerm}&quot;
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                  &ldquo;{searchTerm}&rdquo;
                 </span>
               )}
               {selectedType && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">
-                  Type: {recordTypes.find(t => t.id === selectedType)?.name || selectedType}
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                  {recordTypes.find(t => t.id === selectedType)?.name || selectedType}
                 </span>
               )}
-              <span className="text-sm text-gray-500">
-                {records.length} {records.length === 1 ? 'result' : 'results'} found
+              <span className="text-xs text-gray-400">
+                {records.length} {records.length === 1 ? 'result' : 'results'}
               </span>
             </div>
           )}
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-7 h-7 text-emerald-500 animate-spin" />
           </div>
         ) : groupedRecords.length === 0 ? (
-          <Card className="p-8 text-center">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-2">No records found</p>
-            {(searchTerm || selectedType) && (
-              <button
-                onClick={handleClearFilters}
-                className="text-primary hover:underline text-sm"
-              >
-                Clear filters to see all records
-              </button>
-            )}
-          </Card>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="font-medium text-gray-500">No records found</p>
+              {(searchTerm || selectedType) && (
+                <button onClick={handleClearFilters} className="text-emerald-600 hover:text-emerald-700 text-sm mt-2 font-medium">
+                  Clear filters
+                </button>
+              )}
+            </div>
+          </div>
         ) : (
           <div className="space-y-3">
             {groupedRecords.map((hospital) => (
-              <Card key={hospital.hospitalId} className="overflow-hidden">
+              <div key={hospital.hospitalId} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <button
                   onClick={() => toggleHospital(hospital.hospitalId)}
                   className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`transition-transform duration-200 ${expandedHospitals.includes(hospital.hospitalId) ? 'rotate-90' : ''}`}>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <div className={`transition-transform duration-200 flex-shrink-0 ${expandedHospitals.includes(hospital.hospitalId) ? 'rotate-90' : ''}`}>
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
                     </div>
-                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                      <Building2 className="w-5 h-5" />
+                    <div className="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 flex-shrink-0">
+                      <Building2 className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <h3 className="font-semibold text-gray-800">{hospital.hospitalName}</h3>
-                      <p className="text-sm text-gray-500">{hospital.recordCount} {hospital.recordCount === 1 ? 'record' : 'records'}</p>
+                      <h3 className="font-semibold text-gray-800 text-sm">{hospital.hospitalName}</h3>
+                      <p className="text-xs text-gray-500">{hospital.recordCount} {hospital.recordCount === 1 ? 'record' : 'records'}</p>
                     </div>
                   </div>
                 </button>
@@ -442,20 +442,20 @@ export default function RecordsPage() {
                             <div key={dateGroup.date}>
                               <button
                                 onClick={() => toggleDate(hospital.hospitalId, dateGroup.date)}
-                                className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors gap-2"
                               >
-                                <div className="flex items-center gap-2">
-                                  <div className={`transition-transform duration-200 ${isDateExpanded ? 'rotate-90' : ''}`}>
-                                    <ChevronRight className="w-4 h-4 text-gray-400" />
-                                  </div>
-                                  <Calendar className="w-4 h-4 text-gray-400" />
-                                  <span className="font-medium text-gray-700">{dateGroup.displayDate}</span>
-                                  <span className="text-gray-400">-</span>
-                                  <span className="text-sm text-emerald-600 font-medium">{dateGroup.reason}</span>
-                                </div>
-                                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                  {dateGroup.recordCount} {dateGroup.recordCount === 1 ? 'record' : 'records'}
-                                </span>
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                          <div className={`transition-transform duration-200 flex-shrink-0 ${isDateExpanded ? 'rotate-90' : ''}`}>
+                                            <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                                          </div>
+                                          <Calendar className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                                          <span className="font-medium text-gray-700 text-sm">{dateGroup.displayDate}</span>
+                                          <span className="text-gray-300">·</span>
+                                          <span className="text-sm text-emerald-600 font-semibold truncate">{dateGroup.reason}</span>
+                                        </div>
+                                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                                          {dateGroup.recordCount}
+                                        </span>
                               </button>
 
                               <AnimatePresence>
@@ -470,10 +470,10 @@ export default function RecordsPage() {
                                     {dateGroup.records.map((record) => (
                                       <div
                                         key={record.id}
-                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-emerald-50/50 transition-colors group"
                                       >
                                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                                          <div className="w-8 h-8 bg-emerald-100 rounded flex items-center justify-center text-emerald-600 flex-shrink-0">
+                                          <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 flex-shrink-0">
                                             {getRecordTypeIcon(record.recordType.name)}
                                           </div>
                                           <div className="flex-1 min-w-0">
@@ -521,7 +521,7 @@ export default function RecordsPage() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </Card>
+              </div>
             ))}
           </div>
         )}
@@ -544,8 +544,8 @@ export default function RecordsPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4"
             >
-              <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-gray-800">{selectedRecord.title}</h3>
                     <p className="text-sm text-gray-500">

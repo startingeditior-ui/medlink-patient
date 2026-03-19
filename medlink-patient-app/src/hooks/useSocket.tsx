@@ -24,35 +24,27 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
-const getSocketUrl = () => {
-  if (typeof window !== 'undefined') {
-    // Use environment variable if set
-    if (process.env.NEXT_PUBLIC_SOCKET_URL) {
-      return process.env.NEXT_PUBLIC_SOCKET_URL;
-    }
-    
-    // Use current window location for mobile
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    const port = 3001;
-    
-    return `${protocol}//${hostname}:${port}`;
+const getSocketUrl = (): string => {
+  // Always runs client-side only (called inside useEffect)
+  if (process.env.NEXT_PUBLIC_SOCKET_URL) {
+    return process.env.NEXT_PUBLIC_SOCKET_URL;
   }
-  return 'http://localhost:3001';
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}:3001`;
 };
-
-const SOCKET_URL = getSocketUrl();
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    const SOCKET_URL = getSocketUrl();
     console.log('Initializing socket connection to:', SOCKET_URL);
-    
-    // Create socket
+
+    // Create socket — use polling first, then upgrade to websocket (Socket.IO best practice)
     const newSocket = io(SOCKET_URL, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 3000,
